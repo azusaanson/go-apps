@@ -21,12 +21,10 @@
   - Auth
   - Async
   - Redis
-  - Session Management 
+  - Session Management
   - Logs
   - Error Handle
 - Set up OpenAPI
-
-
 
 ## TECH
 
@@ -72,9 +70,15 @@
     - EKS
     - Route53 (domain)
   - Auto deploy
-- Better API 
+- Better API
   - test (mockdb)
   - CI
   - OpenAPI
   - fix API
   - add more API
+
+## Get Started
+
+```bash
+  brew install golang-migrate
+```
