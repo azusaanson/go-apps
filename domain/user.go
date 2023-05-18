@@ -104,6 +104,8 @@ const (
 	RoleAdmin UserRole = "admin"
 )
 
+var ErrUserRoleInvalid = errors.New("user role: invalid type")
+
 func NewUserRole(v string) (UserRole, error) {
 	switch v {
 	case string(RoleUser):
@@ -112,7 +114,7 @@ func NewUserRole(v string) (UserRole, error) {
 		return RoleAdmin, nil
 	}
 
-	return UserRole(""), nil
+	return UserRole(""), ErrUserRoleInvalid
 }
 
 type UserQuery interface {
