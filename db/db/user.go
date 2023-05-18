@@ -16,13 +16,13 @@ type UserQueries interface {
 	DeleteUser(ctx context.Context, userID domain.UserID) error
 }
 
-func (uq *Store) GetUserByName(
+func (s *Store) GetUserByName(
 	ctx context.Context,
 	name domain.UserName,
 ) (*domain.User, error) {
 	record := &User{}
 
-	err := uq.conn.Model(&User{}).
+	err := s.conn.Model(&User{}).
 		Where("name = ?", name).
 		First(record).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -36,7 +36,7 @@ func (uq *Store) GetUserByName(
 	return domain.NewUserFromSource(record.ID, record.Name, record.Password, record.Role)
 }
 
-func (uq *Store) CreateUser(
+func (s *Store) CreateUser(
 	ctx context.Context,
 	user *domain.User,
 ) error {
@@ -46,18 +46,18 @@ func (uq *Store) CreateUser(
 		Role:     string(user.Role()),
 	}
 
-	if err := uq.conn.Create(record).Error; err != nil {
+	if err := s.conn.Create(record).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (uq *Store) UpdateUser(
+func (s *Store) UpdateUser(
 	ctx context.Context,
 	user *domain.User,
 ) error {
-	err := uq.conn.
+	err := s.conn.
 		Model(&User{}).
 		Where("id = ?", user.ID()).
 		Updates(map[string]interface{}{
@@ -72,11 +72,11 @@ func (uq *Store) UpdateUser(
 	return nil
 }
 
-func (uq *Store) DeleteUser(
+func (s *Store) DeleteUser(
 	ctx context.Context,
 	userID domain.UserID,
 ) error {
-	err := uq.conn.
+	err := s.conn.
 		Where("id = ?", userID).
 		Delete(&User{}).Error
 	if err != nil {
