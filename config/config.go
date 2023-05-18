@@ -7,7 +7,6 @@ import (
 )
 
 type Config struct {
-	DBDriver     string `mapstructure:"DB_DRIVER"`
 	DBUser       string `mapstructure:"DB_USER"`
 	DBPassword   string `mapstructure:"DB_PASSWORD"`
 	DBHost       string `mapstructure:"DB_HOST"`
