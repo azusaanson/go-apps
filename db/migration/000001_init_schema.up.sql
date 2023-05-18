@@ -1,6 +1,6 @@
 CREATE TABLE `user` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `username` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` varchar(255) NOT NULL COMMENT 'admin, user',
   `updated_at` timestamp NOT NULL DEFAULT (now()),
