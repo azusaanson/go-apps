@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -188,11 +187,4 @@ func (v Password) Hash() HashedPassword {
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(v), PasswordHashCost)
 
 	return hashed
-}
-
-type UserQueries interface {
-	GetUserByName(ctx context.Context, name UserName) (*User, error)
-	CreateUser(ctx context.Context, user *User) error
-	UpdateUser(ctx context.Context, user *User) error
-	DeleteUser(ctx context.Context, userID UserID) error
 }

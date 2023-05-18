@@ -4,7 +4,7 @@ import (
 	"net"
 
 	"github.com/azusaanson/invest-api/config"
-	"github.com/azusaanson/invest-api/db/store"
+	"github.com/azusaanson/invest-api/db/db"
 	"github.com/azusaanson/invest-api/gapi"
 	"github.com/azusaanson/invest-api/proto/pb"
 	"github.com/golang-migrate/migrate/v4"
@@ -31,12 +31,12 @@ func main() {
 
 	runDBMigration(config.MigrationURL, "mysql://"+dbSource)
 
-	store := store.NewStore(conn)
+	store := db.NewStore(conn)
 
 	runGrpcServer(config, store)
 }
 
-func runGrpcServer(config config.Config, store *store.Store) {
+func runGrpcServer(config config.Config, store db.StoreInterface) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")

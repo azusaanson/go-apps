@@ -21,7 +21,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, err
 	}
 
-	if err := server.store.UserQuery.CreateUser(ctx, user); err != nil {
+	if err := server.store.CreateUser(ctx, user); err != nil {
 		return nil, err
 	}
 
