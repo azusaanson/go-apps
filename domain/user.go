@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -19,6 +22,18 @@ func (u *User) HashedPassword() HashedPassword { return u.hashedPassword }
 func (u *User) Role() UserRole                 { return u.role }
 
 func NewUser(
+	name UserName,
+	hashedPassword HashedPassword,
+	role UserRole,
+) (*User, error) {
+	return &User{
+		name:           name,
+		hashedPassword: hashedPassword,
+		role:           role,
+	}, nil
+}
+
+func NewUserFromSource(
 	id uint64,
 	name string,
 	hashedPassword string,
@@ -85,7 +100,7 @@ func NewUserName(v string) (UserName, error) {
 	return UserName(v), nil
 }
 
-type HashedPassword string
+type HashedPassword []byte
 
 var ErrHashedPasswordEmpty = errors.New("hashed password: must not be empty")
 
@@ -117,9 +132,67 @@ func NewUserRole(v string) (UserRole, error) {
 	return UserRole(""), ErrUserRoleInvalid
 }
 
-type UserQuery interface {
+type Password string
+
+const (
+	PasswordMinLength = 8
+	PasswordMaxLength = 16
+	PasswordHashCost  = 10
+)
+
+var (
+	ErrPasswordEmpty    = errors.New("Password: must not be empty")
+	ErrPasswordTooShort = fmt.Errorf(
+		"Password: must be at least %d characters",
+		PasswordMinLength,
+	)
+	ErrPasswordTooLong = fmt.Errorf(
+		"Password: must be at shorter than %d characters",
+		PasswordMaxLength,
+	)
+	ErrPasswordDoesNotFollowRule = errors.New("Password: does not follow the rules")
+	PasswordCharcters            = regexp.MustCompile("^[0-9a-zA-Z!-/:-@[-`{-~]+$")
+	PasswordMustIncludes         = []*regexp.Regexp{
+		regexp.MustCompile("[[:alpha:]]"),
+		regexp.MustCompile("[[:digit:]]"),
+		regexp.MustCompile("[[:punct:]]"),
+	}
+)
+
+func NewPassword(v string) (Password, error) {
+	if v == "" {
+		return "", ErrPasswordEmpty
+	}
+
+	if len([]rune(v)) < PasswordMinLength {
+		return "", ErrPasswordTooShort
+	}
+
+	if PasswordMaxLength < len([]rune(v)) {
+		return "", ErrPasswordTooLong
+	}
+
+	if !PasswordCharcters.MatchString(v) {
+		return "", ErrPasswordDoesNotFollowRule
+	}
+	for _, expected := range PasswordMustIncludes {
+		if expected.FindString(v) == "" {
+			return "", ErrPasswordDoesNotFollowRule
+		}
+	}
+
+	return Password(v), nil
+}
+
+func (v Password) Hash() HashedPassword {
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(v), PasswordHashCost)
+
+	return hashed
+}
+
+type UserQueries interface {
 	GetUserByName(ctx context.Context, name UserName) (*User, error)
-	CreateUser(ctx context.Context, user User) error
-	UpdateUser(ctx context.Context, user User) error
+	CreateUser(ctx context.Context, user *User) error
+	UpdateUser(ctx context.Context, user *User) error
 	DeleteUser(ctx context.Context, userID UserID) error
 }
