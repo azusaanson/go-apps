@@ -1,17 +1,17 @@
-package dbUser
+package user
 
 import (
 	"context"
 
-	"github.com/azusaanson/invest-api/db"
+	"github.com/azusaanson/invest-api/db/model"
 	"github.com/azusaanson/invest-api/domain"
 )
 
-func (uq *userQuery) CreateUser(
+func (uq *UserQuery) CreateUser(
 	ctx context.Context,
-	user domain.User,
+	user *domain.User,
 ) error {
-	record := &db.User{
+	record := &model.User{
 		Name:     string(user.Name()),
 		Password: string(user.HashedPassword()),
 		Role:     string(user.Role()),
@@ -24,12 +24,12 @@ func (uq *userQuery) CreateUser(
 	return nil
 }
 
-func (uq *userQuery) UpdateUser(
+func (uq *UserQuery) UpdateUser(
 	ctx context.Context,
-	user domain.User,
+	user *domain.User,
 ) error {
 	err := uq.conn.
-		Model(&db.User{}).
+		Model(&model.User{}).
 		Where("id = ?", user.ID()).
 		Updates(map[string]interface{}{
 			"name":     user.Name(),
@@ -43,13 +43,13 @@ func (uq *userQuery) UpdateUser(
 	return nil
 }
 
-func (uq *userQuery) DeleteUser(
+func (uq *UserQuery) DeleteUser(
 	ctx context.Context,
 	userID domain.UserID,
 ) error {
 	err := uq.conn.
 		Where("id = ?", userID).
-		Delete(&db.User{}).Error
+		Delete(&model.User{}).Error
 	if err != nil {
 		return err
 	}

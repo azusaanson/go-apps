@@ -1,28 +1,28 @@
-package dbUser
+package user
 
 import (
 	"context"
 
 	"errors"
 
-	"github.com/azusaanson/invest-api/db"
+	"github.com/azusaanson/invest-api/db/model"
 	"github.com/azusaanson/invest-api/domain"
 	"gorm.io/gorm"
 )
 
-type userQuery struct{ conn *gorm.DB }
+type UserQuery struct{ conn *gorm.DB }
 
-func NewUserQuery(conn *gorm.DB) domain.UserQuery {
-	return &userQuery{conn: conn}
+func NewUserQuery(conn *gorm.DB) domain.UserQueries {
+	return &UserQuery{conn: conn}
 }
 
-func (uq *userQuery) GetUserByName(
+func (uq *UserQuery) GetUserByName(
 	ctx context.Context,
 	name domain.UserName,
 ) (*domain.User, error) {
-	record := &db.User{}
+	record := &model.User{}
 
-	err := uq.conn.Model(&db.User{}).
+	err := uq.conn.Model(&model.User{}).
 		Where("name = ?", name).
 		First(record).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -33,5 +33,5 @@ func (uq *userQuery) GetUserByName(
 		return nil, nil
 	}
 
-	return domain.NewUser(record.ID, record.Name, record.Password, record.Role)
+	return domain.NewUserFromSource(record.ID, record.Name, record.Password, record.Role)
 }
