@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+option go_package = "github.com/azusaanson/invest-api/proto/pb";
+
+service Invest {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
+    rpc Login (LoginRequest) returns (LoginResponse) {}
+}

@@ -12,4 +12,10 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down
 
-.PHONY: mysql new_migration migrateup migratedown
+proto:
+	rm -f proto/pb/*.go
+	protoc --proto_path=proto/v1 --go_out=proto/pb --go_opt=paths=source_relative \
+    --go-grpc_out=proto/pb --go-grpc_opt=paths=source_relative \
+    proto/v1/*.proto
+
+.PHONY: mysql new_migration migrateup migratedown proto
