@@ -6,7 +6,6 @@ import (
 
 type Store struct {
 	conn *gorm.DB
-	UserQueries
 }
 
 type StoreInterface interface {
