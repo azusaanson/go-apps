@@ -7,12 +7,14 @@ import (
 	"github.com/azusaanson/invest-api/db/db"
 	"github.com/azusaanson/invest-api/gapi"
 	"github.com/azusaanson/invest-api/proto/pb"
-	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/source/file"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 func main() {
@@ -24,12 +26,17 @@ func main() {
 	// if config.DBDriver == "mysql"
 	dbSource := config.DBUser + ":" + config.DBPassword + "@tcp(" + config.DBHost + ":" + config.DBPort + ")/" + config.DBName
 
-	conn, err := gorm.Open(mysql.Open(dbSource+"?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
+	conn, err := gorm.Open(mysql.Open(dbSource+"?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db")
 	}
 
-	runDBMigration(config.MigrationURL, "mysql://"+dbSource)
+	// add later
+	//runDBMigration(config.MigrationURL, "mysql://"+dbSource)
 
 	store := db.NewStore(conn)
 
@@ -58,15 +65,17 @@ func runGrpcServer(config config.Config, store db.StoreInterface) {
 	}
 }
 
+/* add later
 func runDBMigration(migrationURL string, dbSource string) {
 	migration, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
-		log.Fatal().Err(err).Msg("cannot create new migrate instance")
+		log.Fatal().Err(err).Msgf("cannot create new migrate instance on %s", migrationURL+dbSource)
 	}
 
 	if err = migration.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal().Err(err).Msg("failed to run migrate up")
+		log.Fatal().Err(err).Msgf("failed to run migrate up on %s", migrationURL+dbSource)
 	}
 
 	log.Info().Msg("db migrated successfully")
 }
+*/

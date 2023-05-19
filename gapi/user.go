@@ -53,6 +53,11 @@ func validateCreateUserRequest(req *pb.CreateUserRequest) error {
 	return nil
 }
 
+func (server *Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	res := &pb.LoginResponse{}
+	return res, nil
+}
+
 func toUserResponse(user *domain.User) *pb.User {
 	return &pb.User{
 		Name: string(user.Name()),

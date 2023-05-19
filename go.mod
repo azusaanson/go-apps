@@ -3,6 +3,7 @@ module github.com/azusaanson/invest-api
 go 1.19
 
 require (
+	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/rs/zerolog v1.29.1
 	github.com/spf13/viper v1.15.0

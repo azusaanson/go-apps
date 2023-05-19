@@ -5,7 +5,7 @@ server:
 	go run main.go
 
 mysql:
-	docker run --name mysql8 -p ${DB_PORT}:${DB_PORT} -e MYSQL_ROOT_PASSWORD=${DB_PASSWORD} -e MYSQL_DATABASE=${DB_NAME} -d mysql:8
+	docker run --name mysql -p ${DB_PORT}:${DB_PORT} -e MYSQL_ROOT_PASSWORD=${DB_PASSWORD} -e MYSQL_DATABASE=${DB_NAME} -d mysql:8
 
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)

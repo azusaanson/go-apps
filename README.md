@@ -79,6 +79,24 @@
 
 ## Get Started
 
+1. Install golang-migrate
+
 ```bash
-  brew install golang-migrate
+brew install golang-migrate
+```
+
+2. Build mysql container and run migrate up
+
+```bash
+make mysql
+```
+
+```bash
+make migrateup
+```
+
+3. Start gRPC server
+
+```bash
+make server
 ```
