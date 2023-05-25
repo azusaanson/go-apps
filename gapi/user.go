@@ -16,6 +16,14 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	password, _ := domain.NewPassword(req.GetPassword())
 	role, _ := domain.NewUserRole(req.GetRole())
 
+	userExist, err := server.store.GetUserByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	if userExist != nil {
+		return nil, ErrDuplicateUserName
+	}
+
 	user, err := domain.NewUser(name, password.Hash(), role)
 	if err != nil {
 		return nil, err
