@@ -2,6 +2,7 @@ package main
 
 import (
 	"net"
+	"os"
 
 	"github.com/azusaanson/invest-api/config"
 	"github.com/azusaanson/invest-api/db/db"
@@ -9,6 +10,7 @@ import (
 	"github.com/azusaanson/invest-api/proto/pb"
 	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -18,6 +20,8 @@ import (
 )
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	config, err := config.LoadConfig("config")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
@@ -49,7 +53,8 @@ func runGrpcServer(config config.Config, store db.StoreInterface) {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
 
-	grpcServer := grpc.NewServer()
+	logger := grpc.UnaryInterceptor(gapi.Logger)
+	grpcServer := grpc.NewServer(logger)
 	pb.RegisterInvestServer(grpcServer, server)
 	reflection.Register(grpcServer)
 

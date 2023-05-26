@@ -1,9 +1,10 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
+
+	"github.com/pkg/errors"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -140,16 +141,16 @@ const (
 )
 
 var (
-	ErrPasswordEmpty    = errors.New("Password: must not be empty")
+	ErrPasswordEmpty    = errors.New("password: must not be empty")
 	ErrPasswordTooShort = fmt.Errorf(
-		"Password: must be at least %d characters",
+		"password: must be at least %d characters",
 		PasswordMinLength,
 	)
 	ErrPasswordTooLong = fmt.Errorf(
-		"Password: must be at shorter than %d characters",
+		"password: must be at shorter than %d characters",
 		PasswordMaxLength,
 	)
-	ErrPasswordDoesNotFollowRule = errors.New("Password: does not follow the rules")
+	ErrPasswordDoesNotFollowRule = errors.New("password: does not follow the rules")
 	PasswordCharcters            = regexp.MustCompile("^[0-9a-zA-Z!-/:-@[-`{-~]+$")
 	PasswordMustIncludes         = []*regexp.Regexp{
 		regexp.MustCompile("[[:alpha:]]"),

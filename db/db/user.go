@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/azusaanson/invest-api/domain"
 	"gorm.io/gorm"

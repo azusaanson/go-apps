@@ -5,11 +5,13 @@ import (
 
 	"github.com/azusaanson/invest-api/domain"
 	"github.com/azusaanson/invest-api/proto/pb"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
 )
 
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	if err := validateCreateUserRequest(req); err != nil {
-		return nil, err
+	if violations := validateCreateUserRequest(req); violations != nil {
+		return nil, invalidArgumentError(violations)
 	}
 
 	name, _ := domain.NewUserName(req.GetName())
@@ -18,19 +20,19 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 
 	userExist, err := server.store.GetUserByName(ctx, name)
 	if err != nil {
-		return nil, err
+		return nil, errorWithCode(codes.Internal, err)
 	}
 	if userExist != nil {
-		return nil, ErrDuplicateUserName
+		return nil, errorWithCode(codes.AlreadyExists, ErrDuplicateUserName)
 	}
 
 	user, err := domain.NewUser(name, password.Hash(), role)
 	if err != nil {
-		return nil, err
+		return nil, errorWithCode(codes.Internal, err)
 	}
 
 	if err := server.store.CreateUser(ctx, user); err != nil {
-		return nil, err
+		return nil, errorWithCode(codes.Internal, err)
 	}
 
 	res := &pb.CreateUserResponse{
@@ -39,26 +41,26 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	return res, nil
 }
 
-func validateCreateUserRequest(req *pb.CreateUserRequest) error {
+func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if req.GetName() == "" {
-		return ErrValidationUserNameRequired
+		violations = append(violations, fieldViolation("name", ErrValidationUserNameRequired))
 	} else if _, err := domain.NewUserName(req.GetName()); err != nil {
-		return err
+		violations = append(violations, fieldViolation("name", err))
 	}
 
 	if req.GetPassword() == "" {
-		return ErrValidationUserPasswordRequired
+		violations = append(violations, fieldViolation("password", ErrValidationUserPasswordRequired))
 	} else if _, err := domain.NewPassword(req.GetPassword()); err != nil {
-		return err
+		violations = append(violations, fieldViolation("password", err))
 	}
 
 	if req.GetRole() == "" {
-		return ErrValidationUserRoleRequired
+		violations = append(violations, fieldViolation("role", ErrValidationUserRoleRequired))
 	} else if _, err := domain.NewUserRole(req.GetRole()); err != nil {
-		return err
+		violations = append(violations, fieldViolation("role", err))
 	}
 
-	return nil
+	return violations
 }
 
 func (server *Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
