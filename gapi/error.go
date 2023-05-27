@@ -2,6 +2,7 @@ package gapi
 
 import (
 	"errors"
+	"fmt"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -27,7 +28,11 @@ func invalidArgumentError(violations []*errdetails.BadRequest_FieldViolation) er
 	return statusDetails.Err()
 }
 
-func errorWithCode(code codes.Code, err error) error {
+func errorWithStatus(code codes.Code, err error) error {
+	if err != nil {
+		fmt.Printf("%+v\n", err) // print stack trace
+	}
+
 	return status.New(code, err.Error()).Err()
 }
 

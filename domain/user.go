@@ -41,22 +41,22 @@ func NewUserFromSource(
 ) (*User, error) {
 	newID, err := NewUserID(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	newName, err := NewUserName(name)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	newHashedPassword, err := NewHashedPassword(hashedPassword)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	newRole, err := NewUserRole(role)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &User{
@@ -90,11 +90,11 @@ var (
 
 func NewUserName(v string) (UserName, error) {
 	if v == "" {
-		return "", ErrUserNameEmpty
+		return "", errors.WithStack(ErrUserNameEmpty)
 	}
 
 	if len([]rune(v)) > UserNameMaxLength {
-		return "", ErrUserNameTooLong
+		return "", errors.WithStack(ErrUserNameTooLong)
 	}
 
 	return UserName(v), nil
@@ -106,7 +106,7 @@ var ErrHashedPasswordEmpty = errors.New("hashed password: must not be empty")
 
 func NewHashedPassword(v string) (HashedPassword, error) {
 	if v == "" {
-		return HashedPassword(""), ErrHashedPasswordEmpty
+		return HashedPassword(""), errors.WithStack(ErrHashedPasswordEmpty)
 	}
 
 	return HashedPassword(v), nil
@@ -129,7 +129,7 @@ func NewUserRole(v string) (UserRole, error) {
 		return RoleAdmin, nil
 	}
 
-	return UserRole(""), ErrUserRoleInvalid
+	return UserRole(""), errors.WithStack(ErrUserRoleInvalid)
 }
 
 type Password string
@@ -161,23 +161,23 @@ var (
 
 func NewPassword(v string) (Password, error) {
 	if v == "" {
-		return "", ErrPasswordEmpty
+		return "", errors.WithStack(ErrPasswordEmpty)
 	}
 
 	if len([]rune(v)) < PasswordMinLength {
-		return "", ErrPasswordTooShort
+		return "", errors.WithStack(ErrPasswordTooShort)
 	}
 
 	if PasswordMaxLength < len([]rune(v)) {
-		return "", ErrPasswordTooLong
+		return "", errors.WithStack(ErrPasswordTooLong)
 	}
 
 	if !PasswordCharcters.MatchString(v) {
-		return "", ErrPasswordDoesNotFollowRule
+		return "", errors.WithStack(ErrPasswordDoesNotFollowRule)
 	}
 	for _, expected := range PasswordMustIncludes {
 		if expected.FindString(v) == "" {
-			return "", ErrPasswordDoesNotFollowRule
+			return "", errors.WithStack(ErrPasswordDoesNotFollowRule)
 		}
 	}
 

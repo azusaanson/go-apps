@@ -47,7 +47,7 @@ func (s *Store) CreateUser(
 	}
 
 	if err := s.conn.Create(record).Error; err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -66,7 +66,7 @@ func (s *Store) UpdateUser(
 			"role":     user.Role(),
 		}).Error
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -80,7 +80,7 @@ func (s *Store) DeleteUser(
 		Where("id = ?", userID).
 		Delete(&User{}).Error
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil

@@ -20,19 +20,19 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 
 	userExist, err := server.store.GetUserByName(ctx, name)
 	if err != nil {
-		return nil, errorWithCode(codes.Internal, err)
+		return nil, errorWithStatus(codes.Internal, err)
 	}
 	if userExist != nil {
-		return nil, errorWithCode(codes.AlreadyExists, ErrDuplicateUserName)
+		return nil, errorWithStatus(codes.AlreadyExists, ErrDuplicateUserName)
 	}
 
 	user, err := domain.NewUser(name, password.Hash(), role)
 	if err != nil {
-		return nil, errorWithCode(codes.Internal, err)
+		return nil, errorWithStatus(codes.Internal, err)
 	}
 
 	if err := server.store.CreateUser(ctx, user); err != nil {
-		return nil, errorWithCode(codes.Internal, err)
+		return nil, errorWithStatus(codes.Internal, err)
 	}
 
 	res := &pb.CreateUserResponse{
