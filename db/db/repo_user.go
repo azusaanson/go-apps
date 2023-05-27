@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
 
 	"github.com/azusaanson/invest-api/domain"
 	"gorm.io/gorm"
@@ -26,14 +27,18 @@ func (s *Store) GetUserByName(
 		Where("name = ?", name).
 		First(record).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	if record.ID == 0 {
 		return nil, nil
 	}
 
-	return domain.NewUserFromSource(record.ID, record.Name, record.Password, record.Role)
+	user, err := domain.NewUserFromSource(record.ID, record.Name, record.Password, record.Role)
+	if err != nil {
+		return nil, errorWithStatus(codes.DataLoss, err)
+	}
+	return user, nil
 }
 
 func (s *Store) CreateUser(

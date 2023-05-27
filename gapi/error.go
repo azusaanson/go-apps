@@ -16,6 +16,7 @@ var (
 	ErrDuplicateUserName              = errors.New("duplicate: user name")
 )
 
+// INVALID_ARGUMENT = 3
 func invalidArgumentError(violations []*errdetails.BadRequest_FieldViolation) error {
 	badRequest := &errdetails.BadRequest{FieldViolations: violations}
 	statusInvalid := status.New(codes.InvalidArgument, "invalid parameters")
@@ -28,12 +29,41 @@ func invalidArgumentError(violations []*errdetails.BadRequest_FieldViolation) er
 	return statusDetails.Err()
 }
 
-func errorWithStatus(code codes.Code, err error) error {
+/*
+NOT_FOUND = 5
+ALREADY_EXISTS = 6
+PERMISSION_DENIED = 7
+RESOURCE_EXHAUSTED = 8
+FAILED_PRECONDITION = 9
+ABORTED = 10
+OUT_OF_RANGE = 11
+UNAUTHENTICATED = 16
+*/
+func clientError(code codes.Code, err error) error {
 	if err != nil {
 		fmt.Printf("%+v\n", err) // print stack trace
 	}
 
 	return status.New(code, err.Error()).Err()
+}
+
+/*
+DEADLINE_EXCEEDED = 4
+UNIMPLEMENTED = 12
+INTERNAL = 13
+UNAVAILABLE = 14
+DATA_LOSS = 15
+*/
+func serverError(err error) error {
+	if err != nil {
+		fmt.Printf("%+v\n", err) // print stack trace
+	}
+
+	if _, ok := status.FromError(err); !ok {
+		status.New(codes.Internal, err.Error()).Err()
+	}
+
+	return err
 }
 
 func fieldViolation(field string, err error) *errdetails.BadRequest_FieldViolation {
