@@ -102,7 +102,10 @@ func NewUserName(v string) (UserName, error) {
 
 type HashedPassword []byte
 
-var ErrHashedPasswordEmpty = errors.New("hashed password: must not be empty")
+var (
+	ErrHashedPasswordEmpty    = errors.New("hashed password: must not be empty")
+	ErrHashedPasswordNotMatch = errors.New("hashed password: not match")
+)
 
 func NewHashedPassword(v string) (HashedPassword, error) {
 	if v == "" {
@@ -110,6 +113,14 @@ func NewHashedPassword(v string) (HashedPassword, error) {
 	}
 
 	return HashedPassword(v), nil
+}
+
+func (v HashedPassword) Verify(pass Password) error {
+	if err := bcrypt.CompareHashAndPassword(v, []byte(pass)); err != nil {
+		return errors.Wrap(ErrHashedPasswordNotMatch, err.Error())
+	}
+
+	return nil
 }
 
 type UserRole string

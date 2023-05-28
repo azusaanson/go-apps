@@ -14,6 +14,7 @@ var (
 	ErrValidationUserPasswordRequired = errors.New("validation: user password: required")
 	ErrValidationUserRoleRequired     = errors.New("validation: user role: required")
 	ErrDuplicateUserName              = errors.New("duplicate: user name")
+	ErrNotFoundUser                   = errors.New("not found: user")
 )
 
 // INVALID_ARGUMENT = 3

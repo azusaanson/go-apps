@@ -71,8 +71,45 @@ func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdeta
 }
 
 func (server *Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	res := &pb.LoginResponse{}
+	if violations := validateLoginRequest(req); violations != nil {
+		return nil, invalidArgumentError(violations)
+	}
+
+	name, _ := domain.NewUserName(req.GetName())
+	password, _ := domain.NewPassword(req.GetPassword())
+
+	user, err := server.store.GetUserByName(ctx, name)
+	if err != nil {
+		return nil, serverError(err)
+	}
+	if user == nil {
+		return nil, clientError(codes.NotFound, ErrNotFoundUser)
+	}
+
+	if err := user.HashedPassword().Verify(password); err != nil {
+		return nil, clientError(codes.Unauthenticated, err)
+	}
+
+	res := &pb.LoginResponse{
+		User: toUserResponse(user),
+	}
 	return res, nil
+}
+
+func validateLoginRequest(req *pb.LoginRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+	if req.GetName() == "" {
+		violations = append(violations, fieldViolation("name", ErrValidationUserNameRequired))
+	} else if _, err := domain.NewUserName(req.GetName()); err != nil {
+		violations = append(violations, fieldViolation("name", err))
+	}
+
+	if req.GetPassword() == "" {
+		violations = append(violations, fieldViolation("password", ErrValidationUserPasswordRequired))
+	} else if _, err := domain.NewPassword(req.GetPassword()); err != nil {
+		violations = append(violations, fieldViolation("password", err))
+	}
+
+	return violations
 }
 
 func toUserResponse(user *domain.User) *pb.User {
