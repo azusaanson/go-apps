@@ -5,6 +5,7 @@ import (
 
 	"github.com/azusaanson/invest-api/domain"
 	"github.com/azusaanson/invest-api/proto/pb"
+	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 )
@@ -31,7 +32,13 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, serverError(err)
 	}
 
-	if err := server.store.CreateUser(ctx, user); err != nil {
+	if err = server.store.ExecTx(ctx, func(ctx context.Context) error {
+		if err := server.store.CreateUser(ctx, user); err != nil {
+			return errors.WithStack(err)
+		}
+
+		return nil
+	}); err != nil {
 		return nil, serverError(err)
 	}
 
