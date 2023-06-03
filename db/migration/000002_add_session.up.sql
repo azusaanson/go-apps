@@ -1,5 +1,6 @@
 CREATE TABLE `session` (
-  `id` binary(16) PRIMARY KEY,
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `uuid` varchar(255) NOT NULL,
   `user_id` integer NOT NULL,
   `refresh_token` varchar(255) NOT NULL,
   `user_agent` varchar(255) NOT NULL,

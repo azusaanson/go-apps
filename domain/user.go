@@ -200,3 +200,15 @@ func (v Password) Hash() HashedPassword {
 
 	return hashed
 }
+
+type UserMetaData struct {
+	userAgent UserAgent
+	clientIp  ClientIp
+}
+
+func (m *UserMetaData) UserAgent() UserAgent { return m.userAgent }
+func (m *UserMetaData) ClientIp() ClientIp   { return m.clientIp }
+
+func NewUserMetadata(userAgent UserAgent, clientIp ClientIp) (*UserMetaData, error) {
+	return &UserMetaData{userAgent: userAgent, clientIp: clientIp}, nil
+}

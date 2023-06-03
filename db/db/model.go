@@ -11,15 +11,14 @@ type BaseModel struct {
 }
 
 type Session struct {
-	ID           []byte
+	BaseModel
+	UUID         string
 	UserID       uint64
 	RefreshToken string
 	UserAgent    string
 	ClientIp     string
-	IsBlocked    string
+	IsBlocked    bool
 	ExpiresAt    time.Time
-	UpdatedAt    time.Time
-	CreatedAt    time.Time
 }
 
 type User struct {

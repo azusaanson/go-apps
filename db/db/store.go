@@ -13,6 +13,7 @@ type Store struct {
 type StoreInterface interface {
 	ExecTx(ctx context.Context, fn func(context.Context) error) error
 	UserQueries
+	SessionQueries
 }
 
 func NewStore(conn *gorm.DB) StoreInterface {

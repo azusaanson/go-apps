@@ -14,7 +14,10 @@ var (
 	ErrValidationUserPasswordRequired = errors.New("validation: user password: required")
 	ErrValidationUserRoleRequired     = errors.New("validation: user role: required")
 	ErrDuplicateUserName              = errors.New("duplicate: user name")
+	ErrValidationUserPasswordInvalid  = errors.New("validation: user password: invalid")
 	ErrNotFoundUser                   = errors.New("not found: user")
+	ErrCreateAccessToken              = errors.New("failed to create access token")
+	ErrCreateRefreshToken             = errors.New("failed to create refresh token")
 )
 
 // INVALID_ARGUMENT = 3
