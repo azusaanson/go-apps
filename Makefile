@@ -10,11 +10,23 @@ mysql:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
-migrateup:
+migrate_up:
 	migrate -path db/migration -database $(DB_URL) -verbose up
 
-migratedown:
+migrate_down_one:
+	migrate -path db/migration -database $(DB_URL) -verbose down 1
+
+migrate_down_all:
 	migrate -path db/migration -database $(DB_URL) -verbose down
+
+migrate_to:
+	migrate -path db/migration -database $(DB_URL) -verbose goto $(version)
+
+migrate_force:
+	migrate -path db/migration -database $(DB_URL) -verbose force $(version)
+
+migrate_version:
+	migrate -path db/migration -database $(DB_URL) version
 
 gen_pb:
 	rm -f proto/pb/*.go
@@ -22,4 +34,4 @@ gen_pb:
     --go-grpc_out=proto/pb --go-grpc_opt=paths=source_relative \
     proto/v1/*.proto
 
-.PHONY: server mysql new_migration migrateup migratedown gen_pb
+.PHONY: server mysql new_migration migrate_up migrate_down_one migrate_down_all migrate_to migrate_force migrate_version gen_pb
