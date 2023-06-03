@@ -6,8 +6,20 @@ import (
 
 type BaseModel struct {
 	ID        uint64
-	CreatedAt time.Time
 	UpdatedAt time.Time
+	CreatedAt time.Time
+}
+
+type Session struct {
+	ID           []byte
+	UserID       uint64
+	RefreshToken string
+	UserAgent    string
+	ClientIp     string
+	IsBlocked    string
+	ExpiresAt    time.Time
+	UpdatedAt    time.Time
+	CreatedAt    time.Time
 }
 
 type User struct {
